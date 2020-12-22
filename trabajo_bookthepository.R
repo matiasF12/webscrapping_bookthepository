@@ -1,7 +1,7 @@
 ######## TRABAJO WEB SCRAPPING #########
 
 #Directorio
-setwd("~/ejercicios_big_data/Trabajo_webscrap")
+setwd("~/Github/webscrapping_bookthepository")
 
 #Instalar paquetes
 ###  install.packages("Rvest")
@@ -24,7 +24,6 @@ for(nropag in 1:5){
 
 urlbookthepository <- paste("https://www.bookdepository.com/es/category/3391/Teen-Young-Adult?searchLang=404&page=",nropag, sep="")
 
-
 #Descarga de pagina bookthepository
 bookthepository <- read_html(urlbookthepository)
 
@@ -44,9 +43,8 @@ for(producto in listado_individual){
   texto_libro <- html_text(libro)
   texto_libro <- gsub("\n","", texto_libro)
   texto_libro <- trim(texto_libro)
-  print(texto_libro)}
-  #print(texto_link)
-
+  print(texto_libro)
+  
   #Autor libro
   autor_libro <- html_nodes(producto, css = ".author")
   texto_autor <- html_text(autor_libro)
@@ -55,11 +53,11 @@ for(producto in listado_individual){
   print(texto_autor)
   
   #estrellas libros
-  star_libro <- html_nodes(producto, css = ".stars")
-  texto_star <- html_text(star_libro)
-  texto_star <- gsub("\n", "", texto_star)
-  texto_star <- trim(texto_star) 
-  print(texto_star)
+  #star_libro <- html_nodes(producto, css = ".stars")
+  #texto_star <- html_text(star_libro)
+  #texto_star <- gsub("\n", "", texto_star)
+  #texto_star <- trim(texto_star) 
+  #print(texto_star)
   
   #fecha publicacion libro
   fechapub_libro <- html_nodes(producto, css = ".published")
@@ -84,29 +82,44 @@ for(producto in listado_individual){
   texto_precio <- gsub("[$]","", texto_precio)
   texto_precio <- gsub("[.]", "", texto_precio)
   texto_precio <- trim(texto_precio)
- #texto_precio <- as.numeric(texto_precio)
+  
+  
+  precio_antiguo <- html_nodes(producto, css = ".rrp")
+  texto_precio_ant <- html_text(precio_antiguo)
+  texto_precio_ant <- gsub("[CLP]", "", texto_precio_ant)
+  texto_precio_ant <- gsub("[$]","", texto_precio_ant)
+  texto_precio_ant <- gsub("[.]", "", texto_precio_ant)
+  texto_precio_ant <- as.numeric(texto_precio_ant)
+   if(length(texto_precio_ant) == 1){
+    texto_precio <- gsub(texto_precio_ant, "", texto_precio)
+    texto_precio <- trim(texto_precio)
+   }
+  texto_precio <- as.numeric(texto_precio)
   print(texto_precio)
+  
+
+
   
   #link libros
   link_libro <- html_nodes(libro, css = "a")
   link_libro <- html_attr(link_libro,"href")
   texto_link <- (paste("https://www.bookdepository.com",link_libro, sep = ""))
   print(texto_link)
-  
-  #informacion dentro de cada link del libro
-  subpagina <- read_html(texto_link)
-  for (producto in subpagina){
-   cant_coment <- html_nodes(producto, css= ".rating-count")
-   texto_cant_coment <- html_text(cant_coment)
-   print(texto_cant_coment)
   }
+}
   
   #antigua opcion para entrar a la info de cada libro, que no me funciona
+  subpagina <- read_html(texto_link)
+  cant_comentarios <- html_nodes(subpagina,xpath ="/html/body/div[2]/div[5]/div/div/div[1]/div[1]/div[3]/div/div[1]/div/span[2]")
+  texto_cant_comentarios <- html_text(cant_comentarios)
+  print(texto_cant_comentarios)}}
+
+  #informacion dentro de cada link del libro
   #subpagina <- read_html(texto_link)
-  #cant_comentarios <- html_nodes(subpagina,xpath ="/html/body/div[2]/div[5]/div/div/div[1]/div[1]/div[3]/div/div[1]/div/span[2]")
-  #texto_cant_comentarios <- html_text(cant_comentarios)
-  #print(texto_cant_comentarios)}}
-  
+  #for (producto in subpagina){
+  #cant_coment <- html_nodes(producto, css= ".rating-count")
+  #texto_cant_coment <- html_text(cant_coment)
+  #print(texto_cant_coment)
   
   
 
