@@ -38,14 +38,14 @@ for(producto in listado_individual){
   print("=========================== ITEMS =======================")
   #titulos libros
   libro <- html_nodes(producto, css = ".title")
-  link_libro <- html_nodes(libro, css = "a")
-  link_libro <- html_attr(link_libro,"href")
-  texto_link <- (paste("https://www.bookdepository.com",link_libro, sep = ""))
+  #link_libro <- html_nodes(libro, css = "a")
+  #link_libro <- html_attr(link_libro,"href")
+  #texto_link <- (paste("https://www.bookdepository.com",link_libro, sep = ""))
   texto_libro <- html_text(libro)
   texto_libro <- gsub("\n","", texto_libro)
   texto_libro <- trim(texto_libro)
-  print(texto_libro)
-  print(texto_link)}
+  print(texto_libro)}
+  #print(texto_link)
 
   #Autor libro
   autor_libro <- html_nodes(producto, css = ".author")
@@ -87,16 +87,31 @@ for(producto in listado_individual){
  #texto_precio <- as.numeric(texto_precio)
   print(texto_precio)
   
+  #link libros
+  link_libro <- html_nodes(libro, css = "a")
+  link_libro <- html_attr(link_libro,"href")
+  texto_link <- (paste("https://www.bookdepository.com",link_libro, sep = ""))
+  print(texto_link)
+  
   #informacion dentro de cada link del libro
   subpagina <- read_html(texto_link)
-  cant_comentarios <- html_nodes(subpagina,xpath ="/html/body/div[2]/div[5]/div/div/div[1]/div[1]/div[3]/div/div[1]/div/span[2]")
-  texto_cant_comentarios <- html_text(cant_comentarios)
-  print(texto_cant_comentarios)
+  for (producto in subpagina){
+   cant_coment <- html_nodes(producto, css= ".rating-count")
+   texto_cant_coment <- html_text(cant_coment)
+   print(texto_cant_coment)
+  }
+  
+  #antigua opcion para entrar a la info de cada libro, que no me funciona
+  #subpagina <- read_html(texto_link)
+  #cant_comentarios <- html_nodes(subpagina,xpath ="/html/body/div[2]/div[5]/div/div/div[1]/div[1]/div[3]/div/div[1]/div/span[2]")
+  #texto_cant_comentarios <- html_text(cant_comentarios)
+  #print(texto_cant_comentarios)}}
   
   
   
-  
- 
+
+
+
   
 
 #[paso 2] data frame con informacion de cada item
