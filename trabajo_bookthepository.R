@@ -39,12 +39,13 @@ for(producto in listado_individual){
   #titulos libros
   libro <- html_nodes(producto, css = ".title")
   link_libro <- html_nodes(libro, css = "a")
-  texto_link <- html_attr(link_libro,"href")
+  link_libro <- html_attr(link_libro,"href")
+  texto_link <- (paste("https://www.bookdepository.com",link_libro, sep = ""))
   texto_libro <- html_text(libro)
   texto_libro <- gsub("\n","", texto_libro)
   texto_libro <- trim(texto_libro)
   print(texto_libro)
-  print(texto_link)
+  print(texto_link)}
 
   #Autor libro
   autor_libro <- html_nodes(producto, css = ".author")
