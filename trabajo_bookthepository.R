@@ -20,9 +20,9 @@ library("gdata")
 #[paso 1] data de los libros
 Informacion_bookthe <- data.frame()
 
-for(nropag in 1:5){
-
-urlbookthepository <- paste("https://www.bookdepository.com/es/category/3391/Teen-Young-Adult?searchLang=404&page=",nropag, sep="")
+#for(nropag in 1:5){
+  ",nropag, sep="
+urlbookthepository <- paste("https://www.bookdepository.com/es/category/3391/Teen-Young-Adult?searchLang=404&page=1")
 
 #Descarga de pagina bookthepository
 bookthepository <- read_html(urlbookthepository)
@@ -37,9 +37,6 @@ for(producto in listado_individual){
   print("=========================== ITEMS =======================")
   #titulos libros
   libro <- html_nodes(producto, css = ".title")
-  #link_libro <- html_nodes(libro, css = "a")
-  #link_libro <- html_attr(link_libro,"href")
-  #texto_link <- (paste("https://www.bookdepository.com",link_libro, sep = ""))
   texto_libro <- html_text(libro)
   texto_libro <- gsub("\n","", texto_libro)
   texto_libro <- trim(texto_libro)
@@ -51,13 +48,6 @@ for(producto in listado_individual){
   texto_autor <- gsub("\n", "", texto_autor)
   texto_autor <- trim(texto_autor)
   print(texto_autor)
-  
-  #estrellas libros
-  #star_libro <- html_nodes(producto, css = ".stars")
-  #texto_star <- html_text(star_libro)
-  #texto_star <- gsub("\n", "", texto_star)
-  #texto_star <- trim(texto_star) 
-  #print(texto_star)
   
   #fecha publicacion libro
   fechapub_libro <- html_nodes(producto, css = ".published")
@@ -97,47 +87,61 @@ for(producto in listado_individual){
   texto_precio <- as.numeric(texto_precio)
   print(texto_precio)
   
-
-
-  
   #link libros
   link_libro <- html_nodes(libro, css = "a")
   link_libro <- html_attr(link_libro,"href")
-  texto_link <- (paste("https://www.bookdepository.com",link_libro, sep = ""))
+  texto_link <- paste("https://www.bookdepository.com",link_libro, sep = "")
   print(texto_link)
-  }
-}
-  
+
+
   #antigua opcion para entrar a la info de cada libro, que no me funciona
   subpagina <- read_html(texto_link)
-  cant_comentarios <- html_nodes(subpagina,xpath ="/html/body/div[2]/div[5]/div/div/div[1]/div[1]/div[3]/div/div[1]/div/span[2]")
+  
+  #cantidad comentarios
+  cant_comentarios <- html_nodes(subpagina, xpath = '//*[@id="rating-distribution"]/span')
   texto_cant_comentarios <- html_text(cant_comentarios)
-  print(texto_cant_comentarios)}}
-
-  #informacion dentro de cada link del libro
-  #subpagina <- read_html(texto_link)
-  #for (producto in subpagina){
-  #cant_coment <- html_nodes(producto, css= ".rating-count")
-  #texto_cant_coment <- html_text(cant_coment)
-  #print(texto_cant_coment)
+  if(length(texto_cant_comentarios) == 0){
+    texto_cant_comentarios <- 0
+  }else{
+  texto_cant_comentarios <- gsub("opiniones", "", texto_cant_comentarios)
+  texto_cant_comentarios <- gsub("[.]", "", texto_cant_comentarios)
+  texto_cant_comentarios <- gsub("[(]", "", texto_cant_comentarios)
+  texto_cant_comentarios <- gsub("[)]", "", texto_cant_comentarios)
+  texto_cant_comentarios <- gsub("\n", "", texto_cant_comentarios)
+  texto_cant_comentarios <- trim(texto_cant_comentarios)
+  }
+  texto_cant_comentarios <- as.numeric(texto_cant_comentarios)
+  print(texto_cant_comentarios)
   
   
-
-
-
+  #valoración libro
+  valoracion <- html_nodes(subpagina, xpath = '//*[@id="rating-distribution"]/div[2]')
+  texto_valoracion <- html_text(valoracion)
+  if(length(texto_valoracion)==0){
+    texto_valoracion <- 0
+  }else{
+  texto_valoracion <- gsub("\n", "", texto_valoracion)
+  texto_valoracion <- gsub("de 5 estrellas", "", texto_valoracion)
+  texto_valoracion <- gsub("[,]", ".", texto_valoracion)
+  texto_valoracion <- trim(texto_valoracion)
+    }
+  texto_valoracion <- as.numeric(texto_valoracion)
+  print(texto_valoracion)
   
-
+  
+  
 #[paso 2] data frame con informacion de cada item
 
 item <- data.frame(Titulo = texto_libro, Autor = texto_autor, Precio = texto_precio,
-                   Calificacion = texto_star,Fecha_publicacion = texto_fechapubl,Formato = texto_formato,
-                   Url = texto_link)
+                   Valoracion =  texto_valoracion, Cant_coment = texto_cant_comentarios, 
+                   Fecha_publicacion = texto_fechapubl,Formato = texto_formato, Url = texto_link)
 
 # [paso 3 ]almacenar la info de los libros con los datos totales
 
 Informacion_bookthe <- rbind(Informacion_bookthe,item)
 }
-}
+
+
 
 #write.csv(Informacion_bookthe, "informacion_bookthepository.csv")
 
