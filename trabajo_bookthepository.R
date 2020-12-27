@@ -15,14 +15,13 @@ library("gdata")
 
 #################################
 
-#for(nrodepag in 1:3){}
 
 #[paso 1] data de los libros
 Informacion_bookthe <- data.frame()
-
-#for(nropag in 1:5){
-  ",nropag, sep="
-urlbookthepository <- paste("https://www.bookdepository.com/es/category/3391/Teen-Young-Adult?searchLang=404&page=1")
+# 333 paginas que se pueden ver
+for(nropag in 1:3){
+  
+urlbookthepository <- paste("https://www.bookdepository.com/es/category/3391/Teen-Young-Adult?searchLang=404&page=",nropag, sep="")
 
 #Descarga de pagina bookthepository
 bookthepository <- read_html(urlbookthepository)
@@ -73,7 +72,9 @@ for(producto in listado_individual){
   texto_precio <- gsub("[.]", "", texto_precio)
   texto_precio <- trim(texto_precio)
   
-  
+  if(length(texto_precio)== 0){
+    texto_precio <- NA
+  }
   precio_antiguo <- html_nodes(producto, css = ".rrp")
   texto_precio_ant <- html_text(precio_antiguo)
   texto_precio_ant <- gsub("[CLP]", "", texto_precio_ant)
@@ -98,12 +99,14 @@ for(producto in listado_individual){
   subpagina <- read_html(texto_link)
   
   #cantidad comentarios
+  
   cant_comentarios <- html_nodes(subpagina, xpath = '//*[@id="rating-distribution"]/span')
   texto_cant_comentarios <- html_text(cant_comentarios)
   if(length(texto_cant_comentarios) == 0){
     texto_cant_comentarios <- 0
   }else{
   texto_cant_comentarios <- gsub("opiniones", "", texto_cant_comentarios)
+  texto_cant_comentarios <- gsub("opinión","", texto_cant_comentarios)
   texto_cant_comentarios <- gsub("[.]", "", texto_cant_comentarios)
   texto_cant_comentarios <- gsub("[(]", "", texto_cant_comentarios)
   texto_cant_comentarios <- gsub("[)]", "", texto_cant_comentarios)
@@ -127,20 +130,30 @@ for(producto in listado_individual){
     }
   texto_valoracion <- as.numeric(texto_valoracion)
   print(texto_valoracion)
-  
+
+  #Editorial libro
+  editorial <- subpagina %>% html_node("[itemprop='publisher']") %>% html_attr("itemscope")
+  print(editorial)
+
+  #Numero de paginas
+  cant_pag <- subpagina%>% html_node("[itemprop='numberOfPages']")
+  texto_cant_pag <- html_text(cant_pag)
+  texto_cant_pag <- gsub(" páginas\n", "", texto_cant_pag)
+  texto_cant_pag <- as.numeric(texto_cant_pag)
+  print(texto_cant_pag)
   
   
 #[paso 2] data frame con informacion de cada item
 
 item <- data.frame(Titulo = texto_libro, Autor = texto_autor, Precio = texto_precio,
                    Valoracion =  texto_valoracion, Cant_coment = texto_cant_comentarios, 
-                   Fecha_publicacion = texto_fechapubl,Formato = texto_formato, Url = texto_link)
+                   Fecha_publicacion = texto_fechapubl,Formato = texto_formato, Url = texto_link, Editorial = editorial)
 
 # [paso 3 ]almacenar la info de los libros con los datos totales
 
 Informacion_bookthe <- rbind(Informacion_bookthe,item)
 }
-
+}
 
 
 #write.csv(Informacion_bookthe, "informacion_bookthepository.csv")
@@ -233,6 +246,11 @@ for (i in 1:length(texto_libros)) {
   print(texto_formato[i])
   print(texto_precio[i])
 }
+
+
+
+
+
 
 
 
