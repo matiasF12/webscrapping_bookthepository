@@ -17,9 +17,9 @@ library("gdata")
 
 
 #[paso 1] data de los libros
-Informacion_bookthe <- data.frame()
+Info_bookdepository <- data.frame()
 # 333 paginas que se pueden ver
-for(nropag in 1:3){
+for(nropag in 1:333){
   
 urlbookthepository <- paste("https://www.bookdepository.com/es/category/3391/Teen-Young-Adult?searchLang=404&page=",nropag, sep="")
 
@@ -49,12 +49,12 @@ for(producto in listado_individual){
   print(texto_autor)
   
   #fecha publicacion libro
-  fechapub_libro <- html_nodes(producto, css = ".published")
-  texto_fechapubl <- html_text(fechapub_libro)
-  texto_fechapubl <- gsub("\n", "",texto_fechapubl)
-  texto_fechapubl <- trim(texto_fechapubl)
+  #fechapub_libro <- html_nodes(producto, css = ".published")
+  #texto_fechapubl <- html_text(fechapub_libro)
+  #texto_fechapubl <- gsub("\n", "",texto_fechapubl)
+  #texto_fechapubl <- trim(texto_fechapubl)
   #texto_fechapubl <- as.Date(texto_fechapubl)
-  print(texto_fechapubl)
+  #print(texto_fechapubl)
   
   #formato libro
   formato_libro <- html_nodes(producto, css= ".format")
@@ -145,18 +145,19 @@ for(producto in listado_individual){
   
 #[paso 2] data frame con informacion de cada item
 
-item <- data.frame(Titulo = texto_libro, Autor = texto_autor, Precio = texto_precio,
-                   Valoracion =  texto_valoracion, Cant_coment = texto_cant_comentarios, 
-                   Fecha_publicacion = texto_fechapubl,Formato = texto_formato, Url = texto_link, Editorial = editorial)
+item <- data.frame(Titulo = texto_libro, Autor = texto_autor, Editorial = editorial, 
+                   Precio = texto_precio, Valoracion =  texto_valoracion,
+                   Cant_coment = texto_cant_comentarios, Cant_pag = texto_cant_pag,
+                   Formato = texto_formato, Url = texto_link)
 
 # [paso 3 ]almacenar la info de los libros con los datos totales
 
-Informacion_bookthe <- rbind(Informacion_bookthe,item)
+Info_bookdepository <- rbind(Info_bookdepository,item)
 }
 }
 
 
-#write.csv(Informacion_bookthe, "informacion_bookthepository.csv")
+write.csv(Info_bookdepository, "informacion_bookdepository4.csv")
 
 
 
@@ -246,8 +247,6 @@ for (i in 1:length(texto_libros)) {
   print(texto_formato[i])
   print(texto_precio[i])
 }
-
-
 
 
 
